@@ -16,7 +16,7 @@ By [YoMo framework](https://github.com/yomorun/yomo), we build a real-time strea
 
 ## Getting Started
 
-1. Install `yomo` CLI: `git clone git@github.com:yomorun/yomo.git && cd yomo && make install && cd .. && yomo --version`.
+1. Install `yomo` CLI: `go get -u github.com/yomorun/yomo/cmd/yomo && yomo --version`.
 2. Clone this repository by typing `git clone git@github.com:yomorun/debs-2014.git`. 
 3. Start `debs-zipper`: `yomo wf run debs-zipper/workflow.yaml`
 4. Start `debs-flow`: open another terminal and run `cd debs-flow && go run xx.go`
