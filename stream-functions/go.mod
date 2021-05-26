@@ -6,5 +6,3 @@ require (
 	github.com/yomorun/y3-codec-golang v1.6.9
 	github.com/yomorun/yomo v1.2.520
 )
-
-replace github.com/yomorun/yomo => ../../yomorun/yomo

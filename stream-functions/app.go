@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"reflect"
 	"sort"
 
 	y3 "github.com/yomorun/y3-codec-golang"
+	"github.com/yomorun/yomo/pkg/client"
 	"github.com/yomorun/yomo/pkg/rx"
 )
 
@@ -35,6 +37,17 @@ type Measurement struct {
 func (x Measurement) toString() string {
 	// unique identifier
 	return fmt.Sprintf("%v-%v-%v", x.PlugId, x.HouseholdId, x.HouseId)
+}
+
+func main() {
+	cli, err := client.NewServerless("realtime-calc").Connect("localhost", 9000)
+	if err != nil {
+		log.Print("❌ Connect to zipper failure: ", err)
+		return
+	}
+
+	defer cli.Close()
+	cli.Pipe(Handler)
 }
 
 func decoder(v []byte) (interface{}, error) {
@@ -214,17 +227,6 @@ func median(data []float32) float32 {
 		return data[l/2]
 	}
 }
-
-// // Debug
-// func Handler(rxstream rx.RxStream) rx.RxStream {
-// 	stream := rxstream.
-// 		Subscribe(0x10).
-// 		OnObserve(decoder).
-// 		Map(printer).
-// 		Encode(0x11)
-
-// 	return stream
-// }
 
 // // Query 1
 // func Handler(rxstream rx.RxStream) rx.RxStream {
