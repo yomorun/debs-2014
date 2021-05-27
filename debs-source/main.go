@@ -1,9 +1,13 @@
 package main
 
 import (
+	"encoding/csv"
+	"fmt"
 	"io"
 	"log"
-	"math/rand"
+	"os"
+	"sort"
+	"strconv"
 	"time"
 
 	y3 "github.com/yomorun/y3-codec-golang"
@@ -14,9 +18,9 @@ import (
 // Timestamp    timestamp of measurement (number of seconds since January 1, 1970, 00:00:00 GMT)
 // Value        the measurement
 // Property     type of the measurement: 0 for work or 1 for load
-// PlugId      	a unique identifier (within a household) of the smart plug
-// HouseholdId	a unique identifier of a household (within a house) where the plug is located
-// HouseId     	a unique identifier of a house where the household with the plug is located
+// PlugId          a unique identifier (within a household) of the smart plug
+// HouseholdId    a unique identifier of a household (within a house) where the plug is located
+// HouseId         a unique identifier of a house where the household with the plug is located
 type measurement struct {
 	Id          uint32  `y3:"0x11"`
 	Timestamp   uint32  `y3:"0x12"`
@@ -30,76 +34,93 @@ type measurement struct {
 func main() {
 	client, err := client.NewSource("debs-source").Connect("localhost", 9000)
 	if err != nil {
-		log.Print(err)
+		log.Println(err)
 		return
 	}
-	log.Print("connected")
+	log.Println("connected")
 	generateData(client)
 }
 
 var codec = y3.NewCodec(0x10)
 
+func parseUint32(s string) uint32 {
+	v, err := strconv.ParseUint(s, 10, 32)
+	if err != nil {
+		log.Println("unable to parse string as uint32")
+		return 0
+	}
+	return uint32(v)
+}
+
+func parseFloat32(s string) float32 {
+	v, err := strconv.ParseFloat(s, 32)
+	if err != nil {
+		log.Println("unable to parse string as float32")
+		return 0
+	}
+	return float32(v)
+}
+
+func parseBool(s string) bool {
+	return s == "1"
+}
+
 func generateData(stream io.Writer) {
-	log.Print("generating data...")
-	for {
-		start := time.Now()
-		seconds := uint32(start.Unix())
-		// millis := start.UnixNano() / 1e6
+	log.Println("reading data file...")
+	filename := "data.csv"
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	lines, err := csv.NewReader(file).ReadAll()
+	if err != nil {
+		fmt.Println(err)
+	}
 
-		data := []measurement{
-			// plug 1
-			measurement{
-				Id:          seconds,
-				Timestamp:   seconds,
-				Value:       rand.Float32() * 20,
-				Property:    true, // load
-				PlugId:      0,
-				HouseholdId: 1,
-				HouseId:     2,
-			},
-			measurement{
-				Id:          seconds,
-				Timestamp:   seconds,
-				Value:       rand.Float32() * 20,
-				Property:    false, // work
-				PlugId:      0,
-				HouseholdId: 1,
-				HouseId:     2,
-			},
-
-			// plug 2
-			measurement{
-				Id:          seconds,
-				Timestamp:   seconds,
-				Value:       rand.Float32() * 20,
-				Property:    true, // load
-				PlugId:      3,
-				HouseholdId: 1,
-				HouseId:     2,
-			},
-			measurement{
-				Id:          seconds,
-				Timestamp:   seconds,
-				Value:       rand.Float32() * 20,
-				Property:    false, //work
-				PlugId:      3,
-				HouseholdId: 1,
-				HouseId:     2,
-			},
+	data := make(map[uint32][]measurement)
+	// keys := make([]uint32, 0)
+	for _, line := range lines {
+		x := measurement{
+			Id:          parseUint32(line[0]),
+			Timestamp:   parseUint32(line[1]),
+			Value:       parseFloat32(line[2]),
+			Property:    parseBool(line[3]),
+			PlugId:      parseUint32(line[4]),
+			HouseholdId: parseUint32(line[5]),
+			HouseId:     parseUint32(line[6]),
 		}
+		data[x.Timestamp] = append(data[x.Timestamp], x)
+		// keys = append(keys, x.Timestamp)
+	}
 
-		for _, x := range data {
+	keys := make([]uint32, len(data))
+	i := 0
+	for k := range data {
+		keys[i] = k
+		i++
+	}
+	sort.Slice(keys, func(i, j int) bool { return keys[i] < keys[j] })
+
+	log.Println("sending data...")
+	for _, ts := range keys {
+		start := time.Now()
+		log.Println(ts)
+		arr := data[ts]
+
+		for _, x := range arr {
 			buf, _ := codec.Marshal(x)
 			_, err := stream.Write(buf)
 			if err != nil {
-				log.Print(err)
+				log.Println(err)
 			} else {
-				log.Printf("[%v] %v %v-%v-%v", x.Id, x.Value,
-					x.PlugId, x.HouseholdId, x.HouseId)
+				log.Printf("%v-%v-%v: %v",
+					x.PlugId, x.HouseholdId, x.HouseId, x.Value)
 			}
 		}
 		t := time.Now()
 		elapsed := t.Sub(start)
 		time.Sleep(time.Second - elapsed)
 	}
+	log.Println("done")
 }
