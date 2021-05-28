@@ -119,7 +119,7 @@ func Handler(rxstream rx.RxStream) rx.RxStream {
 		BufferWithTime(ss * 1e3).
 		Map(average).
 		Map(predict).
-		Encode(0x1B)
+		Encode(0x10)
 
 	return stream
 }

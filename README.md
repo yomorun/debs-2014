@@ -16,7 +16,7 @@ By [YoMo framework](https://github.com/yomorun/yomo), we build a real-time strea
 
 ## Getting Started
 
-1. Install `yomo` CLI: `go get -u github.com/yomorun/yomo/cmd/yomo && yomo --version`.
+1. Install `yomo` CLI: `go install -v github.com/yomorun/yomo/cmd/yomo@latest && yomo --version`.
 2. Clone this repository by typing `git clone git@github.com:yomorun/debs-2014.git`. 
 3. Start `yomo-zipper`: `yomo wf run workflow.yaml`
 4. Start streaming function [load-prediction](): `go run cmd/stream-fn-realtime-load-prediction/load-prediction.go`

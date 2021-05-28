@@ -103,7 +103,7 @@ func Handler(rxstream rx.RxStream) rx.RxStream {
 		Map(printer).
 		BufferWithTime(ws * 1e3).
 		Map(outliers).
-		Encode(0x1A)
+		Encode(0x10)
 
 	return stream
 }
