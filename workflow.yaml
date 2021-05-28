@@ -1,6 +1,6 @@
 name: service
 host: localhost
 port: 9000
-flows:
+sinks:
   - name: load-prediction
   - name: outliers
