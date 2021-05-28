@@ -12,7 +12,7 @@ This repository accompanies our blog post "[DEBS Grand Challenge: Real-Time Stre
 
 By [YoMo framework](https://github.com/yomorun/yomo), we build a real-time streaming processing system like this:
 
-![debs 2014 grand challenge by yomo streaming serverless framework](https://blog.yomo.run/static/images/2021-5-13/debs2014-yomo.png)
+![debs 2014 grand challenge by yomo streaming serverless framework](debs2014-arch.png)
 
 ## Getting Started
 
