@@ -1,4 +1,4 @@
-module debs-2014
+module github.com/yomorun/debs2014
 
 go 1.16
 

@@ -18,9 +18,10 @@ By [YoMo framework](https://github.com/yomorun/yomo), we build a real-time strea
 
 1. Install `yomo` CLI: `go get -u github.com/yomorun/yomo/cmd/yomo && yomo --version`.
 2. Clone this repository by typing `git clone git@github.com:yomorun/debs-2014.git`. 
-3. Start `debs-zipper`: `yomo wf run debs-zipper/workflow.yaml`
-4. Start `debs-flow`: open another terminal and run `cd debs-flow && go run xx.go`
-5. Start `debs-source` to generate IoT data: open 3rd terminal and run `cd debs-source && go run main.go`
+3. Start `yomo-zipper`: `yomo wf run workflow.yaml`
+4. Start streaming function [load-prediction](): `go run cmd/stream-fn-realtime-load-prediction/load-prediction.go`
+5. Start mock `data-source` to generate IoT data: `go run cmd/mock-data-source/mock-data.go`
+4. Start streaming function [outliers](): `go run cmd/stream-fn-realtime-outliers/outliers.go`
 
 You should be able to see some exciting results! :)
 

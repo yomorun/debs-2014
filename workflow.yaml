@@ -2,4 +2,5 @@ name: service
 host: localhost
 port: 9000
 flows:
-  - name: realtime-calc
+  - name: load-prediction
+  - name: outliers

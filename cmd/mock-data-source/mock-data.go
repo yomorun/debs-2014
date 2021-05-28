@@ -1,3 +1,20 @@
+/*
+Copyright 2021 The YoMo Authors.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+// This tool emulates IoT data
+// Usage:
+// $ mocck-data
+
 package main
 
 import (
@@ -6,26 +23,10 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/yomorun/debs2014/internal/lib"
 	y3 "github.com/yomorun/y3-codec-golang"
 	"github.com/yomorun/yomo/pkg/client"
 )
-
-// Id           a unique identifier of the measurement
-// Timestamp    timestamp of measurement (number of seconds since January 1, 1970, 00:00:00 GMT)
-// Value        the measurement
-// Property     type of the measurement: 0 for work or 1 for load
-// PlugId      	a unique identifier (within a household) of the smart plug
-// HouseholdId	a unique identifier of a household (within a house) where the plug is located
-// HouseId     	a unique identifier of a house where the household with the plug is located
-type measurement struct {
-	Id          uint32  `y3:"0x11"`
-	Timestamp   uint32  `y3:"0x12"`
-	Value       float32 `y3:"0x13"`
-	Property    bool    `y3:"0x14"`
-	PlugId      uint32  `y3:"0x15"`
-	HouseholdId uint32  `y3:"0x16"`
-	HouseId     uint32  `y3:"0x17"`
-}
 
 func main() {
 	client, err := client.NewSource("debs-source").Connect("localhost", 9000)
@@ -46,9 +47,9 @@ func generateData(stream io.Writer) {
 		seconds := uint32(start.Unix())
 		// millis := start.UnixNano() / 1e6
 
-		data := []measurement{
+		data := []lib.Measurement{
 			// plug 1
-			measurement{
+			{
 				Id:          seconds,
 				Timestamp:   seconds,
 				Value:       rand.Float32() * 20,
@@ -57,7 +58,7 @@ func generateData(stream io.Writer) {
 				HouseholdId: 1,
 				HouseId:     2,
 			},
-			measurement{
+			{
 				Id:          seconds,
 				Timestamp:   seconds,
 				Value:       rand.Float32() * 20,
@@ -68,7 +69,7 @@ func generateData(stream io.Writer) {
 			},
 
 			// plug 2
-			measurement{
+			{
 				Id:          seconds,
 				Timestamp:   seconds,
 				Value:       rand.Float32() * 20,
@@ -77,7 +78,7 @@ func generateData(stream io.Writer) {
 				HouseholdId: 1,
 				HouseId:     2,
 			},
-			measurement{
+			{
 				Id:          seconds,
 				Timestamp:   seconds,
 				Value:       rand.Float32() * 20,
