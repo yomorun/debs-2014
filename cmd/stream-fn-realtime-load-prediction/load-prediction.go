@@ -107,7 +107,13 @@ func predict(_ context.Context, i interface{}) (interface{}, error) {
 	fmt.Println("***************")
 
 	idx += 1
-	return 0.0, nil
+
+	items := make([]lib.Measurement, 0)
+	for _, item := range i.([]interface{}) {
+		items = append(items, item.(lib.Measurement))
+	}
+
+	return items, nil
 }
 
 // Query 1
