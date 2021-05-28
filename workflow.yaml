@@ -1,7 +1,6 @@
 name: service
 host: localhost
 port: 9000
-flows:
-  - name: debs-flow
 sinks:
-  - name: mock-db
+  - name: load-prediction
+  - name: outliers

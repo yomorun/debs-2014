@@ -16,28 +16,12 @@ With [YoMo](https://github.com/yomorun/yomo), we can build a real-time stream pr
 
 ## Getting Started
 
-1. Install `yomo` CLI: `go get -u github.com/yomorun/yomo/cmd/yomo && yomo --version`.
+1. Install `yomo` CLI: `go install -v github.com/yomorun/yomo/cmd/yomo@latest && yomo --version`.
 2. Clone this repository by typing `git clone git@github.com:yomorun/debs-2014.git`. 
-3. Download the [data file](http://www.doc.ic.ac.uk/~mweidlic/sorted.csv.gz) and put it in `debs-source`.
-    ```
-    .
-    ├── README.md
-    ├── debs-flow
-    │   ├── app.go
-    │   ├── go.mod
-    │   ├── go.sum
-    │   └── sl.so
-    ├── debs-source
-    │   ├── data.csv
-    │   ├── go.mod
-    │   ├── go.sum
-    │   └── main.go
-    └── debs-zipper
-        └── workflow.yaml
-    ```
-4. Start `debs-zipper`: `yomo wf run debs-zipper/workflow.yaml`.
-5. Start `debs-flow`: open a new terminal window and run `cd debs-flow && go run app.go`.
-6. Start `debs-source` to generate IoT data: open a 3rd terminal window and run `cd debs-source && go run main.go`.
+3. Start `yomo-zipper`: `yomo wf run workflow.yaml`
+4. Start streaming function [load-prediction](): `go run cmd/stream-fn-realtime-load-prediction/load-prediction.go`
+5. Start mock `data-source` to generate IoT data: `go run cmd/mock-data-source/mock-data.go`
+4. Start streaming function [outliers](): `go run cmd/stream-fn-realtime-outliers/outliers.go`
 
 You should be able to see some exciting results! :)
 
