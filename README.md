@@ -17,7 +17,7 @@ With [YoMo](https://github.com/yomorun/yomo), we can build a real-time stream pr
 ## Getting Started
 
 1. Install `yomo` CLI: `go install -v github.com/yomorun/yomo/cmd/yomo@latest && yomo --version`.
-2. Clone this repository by typing `git clone git@github.com:yomorun/debs-2014.git`. 
+2. Clone this repository by typing `git clone git@github.com:yomorun/debs-2014.git && cd debs-2014`. 
 3. Start `yomo-zipper`: `yomo wf run workflow.yaml`
 4. Start streaming function [load-prediction](): `go run cmd/stream-fn-realtime-load-prediction/load-prediction.go`
 5. Start mock `data-source` to generate IoT data: `go run cmd/mock-data-source/mock-data.go`
@@ -26,6 +26,8 @@ With [YoMo](https://github.com/yomorun/yomo), we can build a real-time stream pr
 You should be able to see some exciting results! :)
 
 ### Join Our Community
+
+If you have any questions, let us know! We hope to see you around.
 
 - [yomorun/yomo](https://github.com/yomorun/yomo)
 - [Discord](https://discord.gg/ccuttFYC)
