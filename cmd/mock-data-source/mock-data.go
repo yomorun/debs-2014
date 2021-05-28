@@ -11,10 +11,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// This tool emulates IoT data
-// Usage:
-// $ mocck-data
-
 package main
 
 import (
