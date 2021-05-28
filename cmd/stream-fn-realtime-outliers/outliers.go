@@ -7,7 +7,6 @@ import (
 	"reflect"
 
 	"github.com/yomorun/debs2014/internal/lib"
-	"github.com/yomorun/y3-codec-golang"
 
 	"github.com/yomorun/yomo/pkg/client"
 	"github.com/yomorun/yomo/pkg/rx"
@@ -26,24 +25,10 @@ func main() {
 	cli.Pipe(Handler)
 }
 
-// Deserialize data from stream
-func decoder(v []byte) (interface{}, error) {
-	var mold []lib.Measurement
-
-	// defined in y3-codec-golang/types.go
-	// decode []byte to interface{}
-	err := y3.ToObject(v, &mold)
-	if err != nil {
-		fmt.Printf("[decoder] %v\n", err)
-		return nil, err
-	}
-	return mold, nil
-}
-
 // an empty interface (interface{}) may hold values of any type;
 // empty interfaces are used by code that handles values of unknown type
 func printer(_ context.Context, i interface{}) (interface{}, error) {
-	items, ok := i.([]lib.Measurement)
+	x, ok := i.(lib.Measurement)
 	if !ok {
 		err := fmt.Sprintf("expected type 'measurement', got '%v' instead",
 			reflect.TypeOf(i))
@@ -51,16 +36,14 @@ func printer(_ context.Context, i interface{}) (interface{}, error) {
 		return nil, fmt.Errorf(err)
 	}
 
-	for _, x := range items {
-		var prop string
-		if x.Property {
-			prop = "load"
-		} else {
-			prop = "work"
-		}
-		fmt.Printf("[%v] %v %v %v\n",
-			x.Timestamp, x.Value, x.ToString(), prop)
+	var prop string
+	if x.Property {
+		prop = "load"
+	} else {
+		prop = "work"
 	}
+	fmt.Printf("[%v] %v %v %v\n",
+		x.Timestamp, x.Value, x.ToString(), prop)
 	return i, nil
 }
 
@@ -68,9 +51,9 @@ func printer(_ context.Context, i interface{}) (interface{}, error) {
 var idx uint32 = 0
 
 func outliers(_ context.Context, i interface{}) (interface{}, error) {
-	lst, ok := i.([]lib.Measurement)
+	lst, ok := i.([]interface{})
 	if !ok {
-		err := fmt.Sprintf("expected type '[]lib.Measurement', got '%v' instead",
+		err := fmt.Sprintf("expected type '[]interface{}', got '%v' instead",
 			reflect.TypeOf(i))
 		fmt.Printf("[outliers] %v\n", err)
 		return nil, fmt.Errorf(err)
@@ -79,7 +62,15 @@ func outliers(_ context.Context, i interface{}) (interface{}, error) {
 	all := make([]float32, 0, len(lst))
 	indiv := make(map[string][]float32) // plug # -> values
 
-	for _, x := range lst {
+	for _, elem := range lst {
+		x, ok := elem.(lib.Measurement)
+		if !ok {
+			err := fmt.Sprintf("expected type 'measurement', got '%v' instead",
+				reflect.TypeOf(elem))
+			fmt.Printf("[outliers] %v\n", err)
+			return nil, fmt.Errorf(err)
+		}
+
 		if x.Property { // load
 			all = append(all, x.Value)
 
@@ -108,8 +99,9 @@ func outliers(_ context.Context, i interface{}) (interface{}, error) {
 func Handler(rxstream rx.RxStream) rx.RxStream {
 	stream := rxstream.
 		Subscribe(0x10).
-		OnObserve(decoder).
+		OnObserve(lib.Decoder).
 		Map(printer).
+		BufferWithTime(ws * 1e3).
 		Map(outliers).
 		Encode(0x10)
 
